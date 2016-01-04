@@ -2,3 +2,6 @@
 name = "ieee802-15-4"
 version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
+
+[dependencies]
+num = "0.1"

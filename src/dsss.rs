@@ -9,8 +9,8 @@ pub enum ModType {
 
 #[derive(Debug)]
 pub struct ChipMap {
-    chips_per_symbol:   usize,
-    bits_per_symbol:    usize,
+    chips_per_symbol:   u32,
+    bits_per_symbol:    u32,
     symbols:            Vec<u8>,
     chips:              Vec<u32>,
 }
@@ -22,6 +22,7 @@ impl ChipMap {
                                        bits_per_symbol:  1,
                                        symbols:          vec![0,1],
                                        chips:            vec![0x000009af, 0x00007650]},
+
             ModType::OQPSK => ChipMap {chips_per_symbol: 32,
                                        bits_per_symbol:  4,
                                        symbols:          vec![0x00, 0x01, 0x02, 0x03,
@@ -43,12 +44,12 @@ impl ChipMap {
 
 #[derive(Debug)]
 pub struct DSSS {
-    pub threshold:  usize,
+    pub threshold:  u32,
     map:            ChipMap,
 }
 
 impl DSSS {
-    pub fn new(mod_type: ModType, threshold: usize) -> DSSS {
+    pub fn new(mod_type: ModType, threshold: u32) -> DSSS {
         let chip_map = ChipMap::new(mod_type);
         assert!(threshold <= chip_map.chips_per_symbol);
         DSSS {  threshold:  threshold,
@@ -56,7 +57,7 @@ impl DSSS {
     }
 
     pub fn decode(&self, chips: u32) -> Option<u8> {
-        let mut min_errors = std::usize::MAX;
+        let mut min_errors = std::u32::MAX;
         let mut symbol_match = std::u8::MAX;
 
         // TODO: is it safe to exit as soon as match is found less than the threshold?
