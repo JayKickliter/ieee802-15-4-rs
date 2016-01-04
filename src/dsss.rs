@@ -1,21 +1,30 @@
+///! A modulue for [Direct Sequence Spread Specturm](https://en.wikipedia.org/wiki/Direct-sequence_spread_spectrum)
 use std;
 use util;
 
+
+/// 802.15.4 modulation types.
 #[derive(Debug)]
 pub enum ModType {
+    /// [Binary phase-shift keying](https://en.wikipedia.org/wiki/Phase-shift_keying#Binary_phase-shift_keying_.28BPSK.29)
     BPSK,
+    /// [Offset quadrature phase-shift keying](https://en.wikipedia.org/wiki/Phase-shift_keying#Offset_QPSK_.28OQPSK.29)
     OQPSK,
 }
 
+
+/// Chip <-> Symbol mapping.
 #[derive(Debug)]
 pub struct ChipMap {
-    chips_per_symbol:   u32,
-    bits_per_symbol:    u32,
-    symbols:            Vec<u8>,
-    chips:              Vec<u32>,
+    pub chips_per_symbol:   u32,
+    pub bits_per_symbol:    u32,
+    pub symbols:            Vec<u8>,
+    pub chips:              Vec<u32>,
 }
 
+
 impl ChipMap {
+    /// Create a new `ChipMap` for a given 802.15.4 `ModType`.
     pub fn new(mod_type: ModType) -> ChipMap {
         match mod_type {
             ModType::BPSK  => ChipMap {chips_per_symbol: 15,
@@ -42,13 +51,16 @@ impl ChipMap {
 }
 
 
+/// A context for signal spreading/despreading.
 #[derive(Debug)]
 pub struct DSSS {
+    /// The number of chips errors allowed for a chip-sequence to be considered valid.
     pub threshold:  u32,
-    map:            ChipMap,
+    pub map:        ChipMap,
 }
 
 impl DSSS {
+    /// Create a new `DSSS` context for given `ModType` and chip error threshold.
     pub fn new(mod_type: ModType, threshold: u32) -> DSSS {
         let chip_map = ChipMap::new(mod_type);
         assert!(threshold <= chip_map.chips_per_symbol);
@@ -56,6 +68,10 @@ impl DSSS {
                 map:        chip_map,}
     }
 
+    /// Decode a sequence of chips.
+    ///
+    /// # Failures
+    /// Returns None when the number of chip errors is greater than `self.threshold`.
     pub fn decode(&self, chips: u32) -> Option<u8> {
         let mut min_errors = std::u32::MAX;
         let mut symbol_match = std::u8::MAX;
