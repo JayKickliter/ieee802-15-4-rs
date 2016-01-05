@@ -1,5 +1,5 @@
 [package]
-name = "ieee802-15-4"
+name = "radio"
 version = "0.1.0"
 authors = ["Jay Kickliter <jay@kickliter.com>"]
 
